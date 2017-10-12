@@ -6,7 +6,7 @@ require 'optparse'
 require 'net/https'
 require 'uri'
 
-module Glec
+Glec = Module.new do
   # GithubのAPIを呼び出し、結果を返す
   def self.get_events(owner: , repo: )
     url = "https://api.github.com/repos/#{owner}/#{repo}/events"
@@ -30,21 +30,23 @@ module Glec
   end
 
   # メインの処理
-  module Main
-    DEFAULT_OWNER = 'jz4o'
-    DEFAULT_REPO  = 'glec'
-
-    params = ARGV.getopts(
-      '',
-      "owner:#{DEFAULT_OWNER}",
-      "repo:#{DEFAULT_REPO}"
-    ).map{ |k,v| [k.to_sym, v] }.to_h
-
-    begin
-      puts Glec.get_events(params)
-    rescue => e
-      puts e.message
-    end
+  def self.start(params)
+    repo_data = params.select{ |key| %i[owner repo].include? key }
+    puts Glec.get_events(repo_data)
+  rescue => e
+    puts e.message
   end
 end
+
+
+DEFAULT_OWNER = 'jz4o'
+DEFAULT_REPO  = 'glec'
+
+params = ARGV.getopts(
+  '',
+  "owner:#{DEFAULT_OWNER}",
+  "repo:#{DEFAULT_REPO}"
+).map{ |k,v| [k.to_sym, v] }.to_h
+
+Glec.start(params)
 
