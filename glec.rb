@@ -8,6 +8,12 @@ require 'uri'
 require 'json'
 
 Glec = Module.new do
+  class Object
+    def introduce
+      puts self.inspect
+    end
+  end
+
   class String
     def to_array_of_hash
       JSON.parse(self)
@@ -49,9 +55,11 @@ Glec = Module.new do
   # メインの処理
   def self.start(params)
     repo_data = params.select{ |key| %i[owner repo].include? key }
-    puts Glec.get_events(repo_data)
+
+    Glec.get_events(repo_data)
       .to_array_of_hash
       .refine_by_user(params[:user])
+      .introduce
   rescue => e
     puts e.message
   end
