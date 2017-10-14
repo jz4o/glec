@@ -28,6 +28,10 @@ Glec = Module.new do
 
       self
     end
+
+    def latest
+      first ? first : []
+    end
   end
 
   # GithubのAPIを呼び出し、結果を返す
@@ -59,6 +63,7 @@ Glec = Module.new do
     Glec.get_events(repo_data)
       .to_array_of_hash
       .refine_by_user(params[:user])
+      .latest
       .introduce
   rescue => e
     puts e.message
