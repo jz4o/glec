@@ -29,6 +29,14 @@ Glec = Module.new do
       self
     end
 
+    def refine_by_type(type)
+      unless type.eql? TARGET_ALL
+        self.select!{ |event| event['type'] =~ /#{type}/i }
+      end
+
+      self
+    end
+
     def latest
       first ? first : []
     end
@@ -63,6 +71,7 @@ Glec = Module.new do
     Glec.get_events(repo_data)
       .to_array_of_hash
       .refine_by_user(params[:user])
+      .refine_by_type(params[:type])
       .latest
       .introduce
   rescue => e
@@ -75,12 +84,14 @@ TARGET_ALL    = 'all'
 DEFAULT_OWNER = 'jz4o'
 DEFAULT_REPO  = 'glec'
 DEFAULT_USER  = TARGET_ALL
+DEFAULT_TYPE  = TARGET_ALL
 
 params = ARGV.getopts(
   '',
   "owner:#{DEFAULT_OWNER}",
   "repo:#{DEFAULT_REPO}",
-  "user:#{DEFAULT_USER}"
+  "user:#{DEFAULT_USER}",
+  "type:#{DEFAULT_TYPE}"
 ).map{ |k,v| [k.to_sym, v] }.to_h
 
 Glec.start(params)
