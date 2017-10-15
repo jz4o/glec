@@ -7,28 +7,31 @@ require 'uri'
 require 'json'
 
 Glec = Module.new do
-  TARGET_ALL    = 'all'
-  DEFAULT_OWNER = 'jz4o'
-  DEFAULT_REPO  = 'glec'
+  TARGET_ALL    = 'all'.freeze
+  DEFAULT_OWNER = 'jz4o'.freeze
+  DEFAULT_REPO  = 'glec'.freeze
   DEFAULT_USER  = TARGET_ALL
   DEFAULT_TYPE  = TARGET_ALL
 
+  # 画面表示用にクラスを拡張
   class Object
     def introduce
-      puts self.inspect
+      puts inspect
     end
   end
 
+  # APIのレスポンス用にクラスを拡張
   class String
     def to_array_of_hash
       JSON.parse(self)
     end
   end
 
+  # イベントの配列用にクラスを拡張
   class Array
     def refine_by_user(user)
       unless user.eql? TARGET_ALL
-        self.select!{ |event| event['actor']['login'].eql? user }
+        select! { |event| event['actor']['login'].eql? user }
       end
 
       self
@@ -36,7 +39,7 @@ Glec = Module.new do
 
     def refine_by_type(type)
       unless type.eql? TARGET_ALL
-        self.select!{ |event| event['type'] =~ /#{type}/i }
+        select! { |event| event['type'] =~ /#{type}/i }
       end
 
       self
@@ -47,14 +50,15 @@ Glec = Module.new do
     end
   end
 
+  # イベント用にクラスを拡張
   class Hash
-    def get_timestamp
+    def timestamp
       self['created_at']
     end
   end
 
   # GithubのAPIを呼び出し、結果を返す
-  def self.get_events(owner: , repo: )
+  def self.get_events(owner:, repo:)
     url = "https://api.github.com/repos/#{owner}/#{repo}/events"
 
     uri = URI.parse(url)
@@ -77,17 +81,16 @@ Glec = Module.new do
 
   # メインの処理
   def self.start(params)
-    repo_data = params.select{ |key| %i[owner repo].include? key }
+    repo_data = params.select { |key| %i[owner repo].include? key }
 
     Glec.get_events(repo_data)
-      .to_array_of_hash
-      .refine_by_user(params[:user])
-      .refine_by_type(params[:type])
-      .latest
-      .get_timestamp
-      .introduce
-  rescue => e
+        .to_array_of_hash
+        .refine_by_user(params[:user])
+        .refine_by_type(params[:type])
+        .latest
+        .timestamp
+        .introduce
+  rescue RuntimeError => e
     puts e.message
   end
 end
-
