@@ -1,3 +1,7 @@
+# glecli
+# Glec on Command Line Interface
+#
+
 $:.unshift File.dirname(__FILE__)
 
 require 'glec'
