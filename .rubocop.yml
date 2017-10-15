@@ -1,0 +1,8 @@
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 30
+
+Style/AsciiComments:
+  Enabled: false
