@@ -47,6 +47,12 @@ Glec = Module.new do
     end
   end
 
+  class Hash
+    def get_timestamp
+      self['created_at']
+    end
+  end
+
   # GithubのAPIを呼び出し、結果を返す
   def self.get_events(owner: , repo: )
     url = "https://api.github.com/repos/#{owner}/#{repo}/events"
@@ -78,6 +84,7 @@ Glec = Module.new do
       .refine_by_user(params[:user])
       .refine_by_type(params[:type])
       .latest
+      .get_timestamp
       .introduce
   rescue => e
     puts e.message
