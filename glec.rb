@@ -43,7 +43,7 @@ Glec = Module.new do
     end
 
     def latest
-      first ? first : []
+      first ? first : {}
     end
   end
 
