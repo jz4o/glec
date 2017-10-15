@@ -2,12 +2,17 @@
 # Github Latest Event Checker
 #
 
-require 'optparse'
 require 'net/https'
 require 'uri'
 require 'json'
 
 Glec = Module.new do
+  TARGET_ALL    = 'all'
+  DEFAULT_OWNER = 'jz4o'
+  DEFAULT_REPO  = 'glec'
+  DEFAULT_USER  = TARGET_ALL
+  DEFAULT_TYPE  = TARGET_ALL
+
   class Object
     def introduce
       puts self.inspect
@@ -78,21 +83,4 @@ Glec = Module.new do
     puts e.message
   end
 end
-
-
-TARGET_ALL    = 'all'
-DEFAULT_OWNER = 'jz4o'
-DEFAULT_REPO  = 'glec'
-DEFAULT_USER  = TARGET_ALL
-DEFAULT_TYPE  = TARGET_ALL
-
-params = ARGV.getopts(
-  '',
-  "owner:#{DEFAULT_OWNER}",
-  "repo:#{DEFAULT_REPO}",
-  "user:#{DEFAULT_USER}",
-  "type:#{DEFAULT_TYPE}"
-).map{ |k,v| [k.to_sym, v] }.to_h
-
-Glec.start(params)
 
