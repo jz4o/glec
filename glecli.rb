@@ -2,9 +2,7 @@
 # Glec on Command Line Interface
 #
 
-$LOAD_PATH.unshift File.dirname(__FILE__)
-
-require 'glec'
+require_relative './glec'
 require 'optparse'
 
 params = ARGV.getopts(
