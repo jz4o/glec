@@ -13,13 +13,6 @@ Glec = Module.new do
   DEFAULT_USER  = TARGET_ALL
   DEFAULT_TYPE  = TARGET_ALL
 
-  # 画面表示用にクラスを拡張
-  class Object
-    def introduce
-      puts inspect
-    end
-  end
-
   # APIのレスポンス用にクラスを拡張
   class String
     def to_array_of_hash
@@ -89,7 +82,6 @@ Glec = Module.new do
         .refine_by_type(params[:type])
         .latest
         .timestamp
-        .introduce
   rescue RuntimeError => e
     puts e.message
   end

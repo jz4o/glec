@@ -38,21 +38,11 @@ RSpec.describe Glec do
         refine_by_type
         latest
         timestamp
-        introduce
       ].join('.')
       allow(Glec).to receive_message_chain(methods).and_return('test_ok')
     end
 
     it { is_expected.to eq 'test_ok' }
-  end
-end
-
-RSpec.describe Object do
-  describe '#introduce' do
-    message = 'test'
-    let(:obj) { Object.new }
-    before { allow(obj).to receive(:inspect).and_return(message) }
-    it { expect { obj.introduce }.to output("#{message}\n").to_stdout }
   end
 end
 

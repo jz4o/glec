@@ -13,4 +13,4 @@ params = ARGV.getopts(
   "type:#{DEFAULT_TYPE}"
 ).map { |k, v| [k.to_sym, v] }.to_h
 
-Glec.start(params)
+puts Glec.start(params)
