@@ -32,28 +32,20 @@ RSpec.describe Glec do
     subject { Glec.start(owner: DEFAULT_OWNER, repo: DEFAULT_REPO) }
 
     let(:events) { '' }
+    let(:events_array) { [] }
     before do
       methods = %w[
-        to_array_of_hash
         refine_by_user
         refine_by_type
         latest
         timestamp
       ].join('.')
-      allow(Glec).to   receive(:get_events).and_return(events)
-      allow(events).to receive_message_chain(methods).and_return('test_ok')
+      allow(Glec).to         receive(:get_events).and_return(events)
+      allow(JSON).to         receive(:parse).and_return(events_array)
+      allow(events_array).to receive_message_chain(methods).and_return('test_ok')
     end
 
     it { is_expected.to eq 'test_ok' }
-  end
-end
-
-RSpec.describe String do
-  describe '#to_array_of_hash' do
-    let(:str)  { '[{"id": "1234"}, {"id": "5678"}]' }
-    let(:hash) { [{ 'id' => '1234' }, { 'id' => '5678' }] }
-    subject { str.to_array_of_hash }
-    it { is_expected.to eq hash }
   end
 end
 

@@ -13,13 +13,6 @@ Glec = Module.new do
   DEFAULT_USER  = TARGET_ALL
   DEFAULT_TYPE  = TARGET_ALL
 
-  # APIのレスポンス用にクラスを拡張
-  class String
-    def to_array_of_hash
-      JSON.parse(self)
-    end
-  end
-
   # イベントの配列用にクラスを拡張
   class Array
     def refine_by_user(user)
@@ -77,11 +70,11 @@ Glec = Module.new do
     repo_data = params.select { |key| %i[owner repo].include? key }
 
     events = get_events(repo_data)
-    events.to_array_of_hash
-          .refine_by_user(params[:user])
-          .refine_by_type(params[:type])
-          .latest
-          .timestamp
+    events_array = JSON.parse events
+    events_array.refine_by_user(params[:user])
+                .refine_by_type(params[:type])
+                .latest
+                .timestamp
   rescue RuntimeError => e
     puts e.message
   end
