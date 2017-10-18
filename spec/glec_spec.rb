@@ -30,16 +30,18 @@ RSpec.describe Glec do
 
   describe '.start' do
     subject { Glec.start(owner: DEFAULT_OWNER, repo: DEFAULT_REPO) }
+
+    let(:events) { '' }
     before do
       methods = %w[
-        get_events
         to_array_of_hash
         refine_by_user
         refine_by_type
         latest
         timestamp
       ].join('.')
-      allow(Glec).to receive_message_chain(methods).and_return('test_ok')
+      allow(Glec).to   receive(:get_events).and_return(events)
+      allow(events).to receive_message_chain(methods).and_return('test_ok')
     end
 
     it { is_expected.to eq 'test_ok' }

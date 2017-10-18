@@ -76,12 +76,12 @@ Glec = Module.new do
   def self.start(params)
     repo_data = params.select { |key| %i[owner repo].include? key }
 
-    Glec.get_events(repo_data)
-        .to_array_of_hash
-        .refine_by_user(params[:user])
-        .refine_by_type(params[:type])
-        .latest
-        .timestamp
+    events = get_events(repo_data)
+    events.to_array_of_hash
+          .refine_by_user(params[:user])
+          .refine_by_type(params[:type])
+          .latest
+          .timestamp
   rescue RuntimeError => e
     puts e.message
   end
