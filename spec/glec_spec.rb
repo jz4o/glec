@@ -104,30 +104,13 @@ RSpec.describe Glec do
     end
   end
 
-  describe '.start' do
-    subject { Glec.start(owner: DEFAULT_OWNER, repo: DEFAULT_REPO) }
+  describe '.get_latest_event' do
+    subject { Glec.get_latest_event(array) }
 
-    let(:events) { '' }
-    let(:events_array) { [] }
-    before do
-      methods = %w[
-        latest
-        timestamp
-      ].join('.')
-      allow(Glec).to         receive(:get_events).and_return(events)
-      allow(JSON).to         receive(:parse).and_return(events_array)
-      allow(Glec).to         receive(:refine_by_user).and_return(events_array)
-      allow(Glec).to         receive(:refine_by_type).and_return(events_array)
-      allow(events_array).to receive_message_chain(methods).and_return('test_ok')
+    context 'array is nil' do
+      let(:array) { nil }
+      it { is_expected.to eq({}) }
     end
-
-    it { is_expected.to eq 'test_ok' }
-  end
-end
-
-RSpec.describe Array do
-  describe '#latest' do
-    subject { array.latest }
 
     context 'array is empty' do
       let(:array) { [] }
@@ -138,6 +121,24 @@ RSpec.describe Array do
       let(:array) { [{ 'id' => '1234' }] }
       it { is_expected.to eq('id' => '1234') }
     end
+  end
+
+  describe '.start' do
+    subject { Glec.start(owner: DEFAULT_OWNER, repo: DEFAULT_REPO) }
+
+    let(:events) { '' }
+    let(:events_array) { [] }
+    let(:event) { {} }
+    before do
+      allow(Glec).to  receive(:get_events).and_return(events)
+      allow(JSON).to  receive(:parse).and_return(events_array)
+      allow(Glec).to  receive(:refine_by_user).and_return(events_array)
+      allow(Glec).to  receive(:refine_by_type).and_return(events_array)
+      allow(Glec).to  receive(:get_latest_event).and_return(event)
+      allow(event).to receive(:timestamp).and_return('test_ok')
+    end
+
+    it { is_expected.to eq 'test_ok' }
   end
 end
 

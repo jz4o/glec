@@ -13,13 +13,6 @@ Glec = Module.new do
   DEFAULT_USER  = TARGET_ALL
   DEFAULT_TYPE  = TARGET_ALL
 
-  # イベントの配列用にクラスを拡張
-  class Array
-    def latest
-      first ? first : {}
-    end
-  end
-
   # イベント用にクラスを拡張
   class Hash
     def timestamp
@@ -69,6 +62,11 @@ Glec = Module.new do
     array
   end
 
+  def self.get_latest_event(events)
+    events ||= []
+    events.first || {}
+  end
+
   # メインの処理
   def self.start(params)
     repo_data = params.select { |key| %i[owner repo].include? key }
@@ -78,8 +76,8 @@ Glec = Module.new do
 
     events_array = refine_by_user(events_array, params[:user])
     events_array = refine_by_type(events_array, params[:type])
-    events_array.latest
-                .timestamp
+    latest_event = get_latest_event(events_array)
+    latest_event.timestamp
   rescue RuntimeError => e
     puts e.message
   end
