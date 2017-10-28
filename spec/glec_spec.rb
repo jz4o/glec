@@ -67,6 +67,43 @@ RSpec.describe Glec do
     end
   end
 
+  describe 'refine_by_type' do
+    subject { Glec.refine_by_type(array, type) }
+
+    test_array = [
+      { 'id' => '1234', 'type' => 'Push' },
+      { 'id' => '5678', 'type' => 'Push' },
+      { 'id' => '9012', 'type' => 'Commit' }
+    ]
+
+    context 'array is nil' do
+      let(:array) { nil }
+      let(:type)  { DEFAULT_TYPE }
+
+      it { is_expected.to eq [] }
+    end
+
+    context 'array is empty' do
+      let(:array) { [] }
+      let(:type)  { 'commit' }
+
+      it { is_expected.to eq [] }
+    end
+
+    context 'disable refine' do
+      let(:array) { test_array }
+      let(:type)  { DEFAULT_TYPE }
+      it { is_expected.to eq test_array }
+    end
+
+    context 'enable refine' do
+      let(:array) { test_array }
+      let(:type)  { 'commit' }
+
+      it { is_expected.to eq [{ 'id' => '9012', 'type' => 'Commit' }] }
+    end
+  end
+
   describe '.start' do
     subject { Glec.start(owner: DEFAULT_OWNER, repo: DEFAULT_REPO) }
 
@@ -74,13 +111,13 @@ RSpec.describe Glec do
     let(:events_array) { [] }
     before do
       methods = %w[
-        refine_by_type
         latest
         timestamp
       ].join('.')
       allow(Glec).to         receive(:get_events).and_return(events)
       allow(JSON).to         receive(:parse).and_return(events_array)
       allow(Glec).to         receive(:refine_by_user).and_return(events_array)
+      allow(Glec).to         receive(:refine_by_type).and_return(events_array)
       allow(events_array).to receive_message_chain(methods).and_return('test_ok')
     end
 
@@ -89,27 +126,6 @@ RSpec.describe Glec do
 end
 
 RSpec.describe Array do
-  describe '#refine_by_type' do
-    let(:array) do
-      [
-        { 'id' => '1234', 'type' => 'Push' },
-        { 'id' => '5678', 'type' => 'Push' },
-        { 'id' => '9012', 'type' => 'Commit' }
-      ]
-    end
-    subject { array.refine_by_type(type) }
-
-    context 'enable refine' do
-      let(:type) { 'commit' }
-      it { is_expected.to eq [{ 'id' => '9012', 'type' => 'Commit' }] }
-    end
-
-    context 'disable refine' do
-      let(:type) { TARGET_ALL }
-      it { is_expected.to eq array }
-    end
-  end
-
   describe '#latest' do
     subject { array.latest }
 

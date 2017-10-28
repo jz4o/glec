@@ -15,14 +15,6 @@ Glec = Module.new do
 
   # イベントの配列用にクラスを拡張
   class Array
-    def refine_by_type(type)
-      unless type.eql? TARGET_ALL
-        select! { |event| event['type'] =~ /#{type}/i }
-      end
-
-      self
-    end
-
     def latest
       first ? first : {}
     end
@@ -67,6 +59,16 @@ Glec = Module.new do
     array
   end
 
+  def self.refine_by_type(array, type)
+    array ||= []
+
+    unless type.eql? TARGET_ALL
+      array.select! { |event| event['type'] =~ /#{type}/i }
+    end
+
+    array
+  end
+
   # メインの処理
   def self.start(params)
     repo_data = params.select { |key| %i[owner repo].include? key }
@@ -75,8 +77,8 @@ Glec = Module.new do
     events_array = JSON.parse events
 
     events_array = refine_by_user(events_array, params[:user])
-    events_array.refine_by_type(params[:type])
-                .latest
+    events_array = refine_by_type(events_array, params[:type])
+    events_array.latest
                 .timestamp
   rescue RuntimeError => e
     puts e.message
