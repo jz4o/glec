@@ -15,14 +15,6 @@ Glec = Module.new do
 
   # イベントの配列用にクラスを拡張
   class Array
-    def refine_by_user(user)
-      unless user.eql? TARGET_ALL
-        select! { |event| event['actor']['login'].eql? user }
-      end
-
-      self
-    end
-
     def refine_by_type(type)
       unless type.eql? TARGET_ALL
         select! { |event| event['type'] =~ /#{type}/i }
@@ -65,14 +57,25 @@ Glec = Module.new do
     end
   end
 
+  def self.refine_by_user(array, user)
+    array ||= []
+
+    unless user.eql? TARGET_ALL
+      array.select! { |event| event['actor']['login'].eql? user }
+    end
+
+    array
+  end
+
   # メインの処理
   def self.start(params)
     repo_data = params.select { |key| %i[owner repo].include? key }
 
     events = get_events(repo_data)
     events_array = JSON.parse events
-    events_array.refine_by_user(params[:user])
-                .refine_by_type(params[:type])
+
+    events_array = refine_by_user(events_array, params[:user])
+    events_array.refine_by_type(params[:type])
                 .latest
                 .timestamp
   rescue RuntimeError => e

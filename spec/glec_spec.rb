@@ -28,6 +28,45 @@ RSpec.describe Glec do
     end
   end
 
+  describe '.refine_by_user' do
+    subject { Glec.refine_by_user(array, user) }
+
+    test_array = [
+      { 'id' => '1234', 'actor' => { 'login' => 'user1' } },
+      { 'id' => '5678', 'actor' => { 'login' => 'user1' } },
+      { 'id' => '9012', 'actor' => { 'login' => 'user2' } }
+    ]
+
+    context 'array is nil' do
+      let(:array) { nil }
+      let(:user)  { DEFAULT_USER }
+
+      it { is_expected.to eq [] }
+    end
+
+    context 'array is empty' do
+      let(:array) { [] }
+      let(:user)  { 'user2' }
+
+      it { is_expected.to eq [] }
+    end
+
+    context 'disable refine' do
+      let(:array) { test_array }
+      let(:user)  { DEFAULT_USER }
+
+      it { is_expected.to eq test_array }
+    end
+
+    context 'enable refine' do
+      let(:array) { test_array }
+      let(:user)  { 'user2' }
+
+      expect_data = [{ 'id' => '9012', 'actor' => { 'login' => 'user2' } }]
+      it { is_expected.to eq expect_data }
+    end
+  end
+
   describe '.start' do
     subject { Glec.start(owner: DEFAULT_OWNER, repo: DEFAULT_REPO) }
 
@@ -35,13 +74,13 @@ RSpec.describe Glec do
     let(:events_array) { [] }
     before do
       methods = %w[
-        refine_by_user
         refine_by_type
         latest
         timestamp
       ].join('.')
       allow(Glec).to         receive(:get_events).and_return(events)
       allow(JSON).to         receive(:parse).and_return(events_array)
+      allow(Glec).to         receive(:refine_by_user).and_return(events_array)
       allow(events_array).to receive_message_chain(methods).and_return('test_ok')
     end
 
@@ -50,28 +89,6 @@ RSpec.describe Glec do
 end
 
 RSpec.describe Array do
-  describe '#refine_by_user' do
-    let(:array) do
-      [
-        { 'id' => '1234', 'actor' => { 'login' => 'user1' } },
-        { 'id' => '5678', 'actor' => { 'login' => 'user1' } },
-        { 'id' => '9012', 'actor' => { 'login' => 'user2' } }
-      ]
-    end
-    subject { array.refine_by_user(user) }
-
-    context 'enable refine' do
-      let(:user) { 'user2' }
-      expect_data = [{ 'id' => '9012', 'actor' => { 'login' => 'user2' } }]
-      it { is_expected.to eq expect_data }
-    end
-
-    context 'disable refine' do
-      let(:user) { TARGET_ALL }
-      it { is_expected.to eq array }
-    end
-  end
-
   describe '#refine_by_type' do
     let(:array) do
       [
