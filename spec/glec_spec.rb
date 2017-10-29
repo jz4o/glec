@@ -4,7 +4,7 @@ include Glec
 
 RSpec.describe Glec do
   describe '.get_events' do
-    subject { proc { Glec.get_events(parameter) } }
+    subject { proc { Glec.send(:get_events, parameter) } }
 
     context 'repository does not exist' do
       let(:parameter) { { owner: DEFAULT_OWNER, repo: 'not_exist_repo' } }
@@ -26,12 +26,12 @@ RSpec.describe Glec do
       end
 
       it { is_expected.not_to raise_error }
-      it { expect(Glec.get_events(parameter)).to eq res }
+      it { expect(subject.call).to eq res }
     end
   end
 
   describe '.refine_by_user' do
-    subject { Glec.refine_by_user(array, user) }
+    subject { Glec.send(:refine_by_user, array, user) }
 
     test_array = [
       { 'id' => '1234', 'actor' => { 'login' => 'user1' } },
@@ -70,7 +70,7 @@ RSpec.describe Glec do
   end
 
   describe 'refine_by_type' do
-    subject { Glec.refine_by_type(array, type) }
+    subject { Glec.send(:refine_by_type, array, type) }
 
     test_array = [
       { 'id' => '1234', 'type' => 'Push' },
@@ -107,7 +107,7 @@ RSpec.describe Glec do
   end
 
   describe '.get_latest_event' do
-    subject { Glec.get_latest_event(array) }
+    subject { Glec.send(:get_latest_event, array) }
 
     context 'array is nil' do
       let(:array) { nil }

@@ -14,6 +14,21 @@ module Glec
   DEFAULT_USER  = TARGET_ALL
   DEFAULT_TYPE  = TARGET_ALL
 
+  # メインの処理
+  def self.start(params)
+    repo_data = params.select { |key| %i[owner repo].include? key }
+
+    events = get_events(repo_data)
+    events_array = JSON.parse events
+
+    events_array = refine_by_user(events_array, params[:user])
+    events_array = refine_by_type(events_array, params[:type])
+    latest_event = get_latest_event(events_array)
+    latest_event['created_at']
+  rescue RuntimeError => e
+    puts e.message
+  end
+
   # GithubのAPIを呼び出し、結果を返す
   def self.get_events(owner:, repo:)
     url = "https://api.github.com/repos/#{owner}/#{repo}/events"
@@ -38,6 +53,7 @@ module Glec
       raise "#{response.code} : #{response.msg}"
     end
   end
+  private_class_method :get_events
 
   def self.refine_by_user(array, user)
     array ||= []
@@ -48,6 +64,7 @@ module Glec
 
     array
   end
+  private_class_method :refine_by_user
 
   def self.refine_by_type(array, type)
     array ||= []
@@ -58,24 +75,11 @@ module Glec
 
     array
   end
+  private_class_method :refine_by_type
 
   def self.get_latest_event(events)
     events ||= []
     events.first || {}
   end
-
-  # メインの処理
-  def self.start(params)
-    repo_data = params.select { |key| %i[owner repo].include? key }
-
-    events = get_events(repo_data)
-    events_array = JSON.parse events
-
-    events_array = refine_by_user(events_array, params[:user])
-    events_array = refine_by_type(events_array, params[:type])
-    latest_event = get_latest_event(events_array)
-    latest_event['created_at']
-  rescue RuntimeError => e
-    puts e.message
-  end
+  private_class_method :get_latest_event
 end
