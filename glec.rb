@@ -6,7 +6,8 @@ require 'net/https'
 require 'uri'
 require 'json'
 
-Glec = Module.new do
+# Githubの任意のリポジトリから最新のEventを取得する
+module Glec
   TARGET_ALL    = 'all'.freeze
   DEFAULT_OWNER = 'jz4o'.freeze
   DEFAULT_REPO  = 'glec'.freeze

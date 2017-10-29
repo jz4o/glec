@@ -1,5 +1,7 @@
 require_relative '../glec'
 
+include Glec
+
 RSpec.describe Glec do
   describe '.get_events' do
     subject { proc { Glec.get_events(parameter) } }

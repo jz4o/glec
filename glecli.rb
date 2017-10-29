@@ -5,6 +5,8 @@
 require_relative './glec'
 require 'optparse'
 
+include Glec
+
 params = ARGV.getopts(
   '',
   "owner:#{DEFAULT_OWNER}",
