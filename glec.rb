@@ -32,6 +32,9 @@ Glec = Module.new do
 
     request = Net::HTTP::Get.new(uri.request_uri)
 
+    access_token = ENV['GITHUB_API_ACCESS_TOKEN']
+    request['Authorization'] = "token #{access_token}" if access_token
+
     response = http.request(request)
 
     case response
