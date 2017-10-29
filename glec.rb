@@ -13,13 +13,6 @@ Glec = Module.new do
   DEFAULT_USER  = TARGET_ALL
   DEFAULT_TYPE  = TARGET_ALL
 
-  # イベント用にクラスを拡張
-  class Hash
-    def timestamp
-      self['created_at']
-    end
-  end
-
   # GithubのAPIを呼び出し、結果を返す
   def self.get_events(owner:, repo:)
     url = "https://api.github.com/repos/#{owner}/#{repo}/events"
@@ -80,7 +73,7 @@ Glec = Module.new do
     events_array = refine_by_user(events_array, params[:user])
     events_array = refine_by_type(events_array, params[:type])
     latest_event = get_latest_event(events_array)
-    latest_event.timestamp
+    latest_event['created_at']
   rescue RuntimeError => e
     puts e.message
   end

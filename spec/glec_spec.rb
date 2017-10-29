@@ -135,18 +135,9 @@ RSpec.describe Glec do
       allow(Glec).to  receive(:refine_by_user).and_return(events_array)
       allow(Glec).to  receive(:refine_by_type).and_return(events_array)
       allow(Glec).to  receive(:get_latest_event).and_return(event)
-      allow(event).to receive(:timestamp).and_return('test_ok')
+      allow(event).to receive(:[]).with('created_at').and_return('test_ok')
     end
 
     it { is_expected.to eq 'test_ok' }
-  end
-end
-
-RSpec.describe Hash do
-  describe '#timestamp' do
-    test_data = 'test_data'
-    let(:hash) { { 'created_at' => test_data } }
-    subject { hash.timestamp }
-    it { is_expected.to eq test_data }
   end
 end
